@@ -27,3 +27,13 @@ This script was created by [Assistant](https://openai.com/blog/openai-assistant/
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Human here
+
+Everything above this heading was written by ChatGPT. Here's the story:
+
+One morning I was thinking that my podcast at some point in 2023 will publish its 100th episode and it would be nice to have a mosaic of all cover images to post on social media. I could go to my Google Drive folder and grab all .jpgs manually, then throw them to Photoshop, etc. But that's not fun. So I decided to get ChatGPT to do it for me. Given a RSS feed, grab all episode cover images and save them to a folder.
+
+You can check the conversation transcript on chat.txt.
+
+
