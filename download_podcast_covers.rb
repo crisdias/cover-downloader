@@ -1,35 +1,54 @@
 #!/usr/bin/env ruby
-require 'open-uri'
 
-# Check if the user provided an RSS feed URL as input
-if ARGV.empty?
-    puts "Please provide the URL of the RSS feed as input."
-    exit 1
+require 'open-uri'
+require 'xmlsimple'
+
+def make_filename(string)
+  string.gsub(/[^[:alpha:]0-9\-\s\ ]/, '')
+end
+
+
+
+
+
+download_dir = "podcast_covers"
+
+# Get the podcast URL from the command line argument
+podcast_url = ARGV[0]
+
+# Get the RSS feed XML
+rss_xml = URI.open(podcast_url).read
+
+# Parse the RSS feed XML
+rss_data = XmlSimple.xml_in(rss_xml)
+
+# Create a directory to save the podcast cover images
+Dir.mkdir(download_dir) unless File.exists?(download_dir)
+
+count = 0
+
+# Iterate through the episodes
+rss_data['channel'][0]['item'].reverse.each do |episode|
+  count = count + 1
+  # Get the episode cover image URL
+  image_url = episode['image'][0]['href']
+  
+  # Download the image
+  # image_file = URI.open(image_url)
+  # Get the file extension from the URL
+  file_extension = image_url.split('?').first.split('.').last
+  
+  episode_num = sprintf("%03d", count)
+  episode_title = episode['title'][0].sub(/^\d+:\? /, "")
+  filename = "#{episode_num} - #{make_filename(episode_title)}.#{file_extension}"
+
+  puts filename
+
+  open("#{download_dir}/" + filename, "wb") do |file|
+    file << URI.open(image_url).read
   end
-  
-  # Set the directory where the images will be downloaded
-  download_dir = "podcast_covers"
-  
-  # Make the download directory if it doesn't exist
-  Dir.mkdir(download_dir) unless Dir.exist?(download_dir)
-  
-  # Download the RSS feed
-  rss_feed = URI.open(ARGV[0]).read
-  
-  # Parse the XML to extract the episode information
-  episodes = rss_feed.scan(/<item>\s*<title>([^<]*)/)
-  
-  # Download and rename the images
-  episodes.reverse.each_with_index do |episode, index|
-    # Extract the episode number and title
-    episode_num = sprintf("%03d", index + 1)
-    episode_title = episode[0].sub(/^\d+: /, "")
-  
-    # Download the image
-    image_url = rss_feed[/<itunes:image href="([^"]*)/, 1]
-    puts "#{download_dir}/#{episode_num} - #{episode_title}.jpg"
-    URI.open("#{download_dir}/#{episode_num} - #{episode_title}.jpg", "wb") do |file|
-      file << URI.open(image_url).read
-    end
-  end
-  
+
+end
+
+
+
